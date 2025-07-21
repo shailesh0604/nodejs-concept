@@ -1,3 +1,4 @@
+const { error } = require("console");
 const users = require("./MOCK_DATA.json");
 
 const express = require("express");
@@ -51,26 +52,41 @@ app
 
       return res.status(200).json({ status: "deleted" });
     });
+  })
+  .patch((req, res) => {
+    const userId = req.params.id;
+    const index2 = users.findIndex((e) => e.id === userId);
+
+    if (index2 === -1) {
+      res.send(404).json({ staus: "error", message: "User Not Exists" });
+    }
   });
 
 app.post("/api/users", (req, res) => {
   const data = req.body;
 
-  console.log(data);
-  // const userName = body.first_name;
+  console.log("data :", data);
+  const userEmail = data.email;
+  console.log("user email :", userEmail);
 
-  const ifFound = users.filter((e) => e.first_name === userName);
-  console.log(ifFound);
-  return ifFound;
+  const ifFound = users.find((e) => e.email === userEmail);
 
-  // users.push({ ...body, id: users.length + 1 });
-  // fs.writeFile("./MOCK_DATA.json", JSON.stringify(users), (err, data) => {
-  //   if (err) return res.status(500).json({ status: "error" });
+  if (ifFound) {
+    // Email already exists, send error response
+    return res
+      .status(409)
+      .json({ status: "error", message: "Email already exists" });
+  }
 
-  //   return res.status(200).json({ status: "updated" });
-  // });
-  // console.log(body);
-  // // return res.json({ status: "pending" });
+  const newUser = { ...data, id: users.length + 1 };
+
+  users.push(newUser);
+
+  fs.writeFile("./MOCK_DATA.json", JSON.stringify(users), (err, data) => {
+    if (err) return res.status(500).json({ status: "error" });
+
+    return res.status(200).json({ status: "updated" });
+  });
 });
 
 app.listen(port, () => {

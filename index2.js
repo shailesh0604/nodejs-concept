@@ -12,9 +12,14 @@ app.get("/", (req, res) => {
   res.send("Hello World!");
 });
 
-// app.get("/api/user", (req, res) => {
-//   res.json(users);
-// });
+app.use((req, res, next) => {
+  console.log("hello middle ware 1");
+  next();
+});
+
+app.get("/api/user", (req, res) => {
+  res.json(users);
+});
 
 // app.get("/api/user/:id", (req, res) => {
 //   const userId = Number(req.params.id);

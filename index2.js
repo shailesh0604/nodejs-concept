@@ -54,12 +54,38 @@ app
     });
   })
   .patch((req, res) => {
-    const userId = req.params.id;
-    const index2 = users.findIndex((e) => e.id === userId);
+    const userId = Number(req.params.id);
+    const updateData = req.body;
 
-    if (index2 === -1) {
-      res.send(404).json({ staus: "error", message: "User Not Exists" });
+    const index = users.findIndex((user) => user.id === userId);
+
+    if (index === -1) {
+      return res
+        .status(404)
+        .json({ status: "error", message: "User Not Exists" });
     }
+
+    const user = users[index];
+
+    // Only update existing fields
+    for (const key in updateData) {
+      if (key in user) {
+        user[key] = updateData[key];
+      }
+    }
+
+    // Save updated users array
+    fs.writeFile("./MOCK_DATA.json", JSON.stringify(users, null, 2), (err) => {
+      if (err) {
+        return res
+          .status(500)
+          .json({ status: "error", message: "Failed to update user" });
+      }
+
+      return res
+        .status(200)
+        .json({ status: "success", message: "User updated", user });
+    });
   });
 
 app.post("/api/users", (req, res) => {

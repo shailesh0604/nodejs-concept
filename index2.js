@@ -17,6 +17,11 @@ app.use((req, res, next) => {
   next();
 });
 
+app.use((req, res, next) => {
+  console.log("hello middle ware 2");
+  next();
+});
+
 app.get("/api/user", (req, res) => {
   res.json(users);
 });
